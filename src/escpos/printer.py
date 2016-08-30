@@ -34,7 +34,7 @@ class Usb(Escpos):
 
     """
 
-    def __init__(self, idVendor, idProduct, timeout=0, in_ep=0x82, out_ep=0x01, *args, **kwargs):
+    def __init__(self, idVendor, idProduct,device_no=False, timeout=0, in_ep=0x82, out_ep=0x01, *args, **kwargs):
         """
         :param idVendor: Vendor ID
         :param idProduct: Product ID
@@ -45,6 +45,7 @@ class Usb(Escpos):
         Escpos.__init__(self, *args, **kwargs)
         self.idVendor = idVendor
         self.idProduct = idProduct
+        self.device_no = device_no
         self.timeout = timeout
         self.in_ep = in_ep
         self.out_ep = out_ep
@@ -52,7 +53,13 @@ class Usb(Escpos):
 
     def open(self):
         """ Search device on USB tree and set it as escpos device """
-        self.device = usb.core.find(idVendor=self.idVendor, idProduct=self.idProduct)
+        if(self.device_no == False){
+            self.device = usb.core.find(idVendor=self.idVendor, idProduct=self.idProduct)
+        }else{
+            self.device_list = tuple(usb.core.find(find_all=True, idVendor=self.idVendor, idProduct=self.idProduct))
+            self.device = self.device_list[self.device_no]
+        }
+        
         if self.device is None:
             raise USBNotFoundError("Device not found or cable not plugged in.")
 
